@@ -31,9 +31,18 @@ def shutdown_session(response_or_exc):
 """
 
 def log_message(d):
+    print("ZZZ",json.dumps(d['payload']))
+    payload = json.dumps(d['payload'])
+    log_obj = Log(message=payload)
+    g.session.add(log_obj)
+    g.session.commit()
+    print("LOG",g.session.query(Log).all())
+    # log_obj = Log( sender_pk=newLog['sender_pk'],receiver_pk=newOrder['receiver_pk'], buy_currency=newOrder['buy_currency'], sell_currency=newOrder['sell_currency'], buy_amount=newOrder['buy_amount'], sell_amount=newOrder['sell_amount'] )
+    # session.add(order_obj)
+    # session.commit()
     # Takes input dictionary d and writes it to the Log table
-    print("LOG",Log)
-    # pass
+    
+    pass
 
 """
 ---------------- Endpoints ----------------
@@ -66,15 +75,14 @@ def trade():
             
         #Your code here
         #Note that you can access the database session using g.session
+        return {}
 
 @app.route('/order_book')
 def order_book():
     result = {"data": g.session.query(Order).all()}
-    
-    print(result)
-    #Your code here
-    #Note that you can access the database session using g.session
     return jsonify(result)
+
 
 if __name__ == '__main__':
     app.run(port='5002')
+
