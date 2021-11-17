@@ -32,7 +32,8 @@ def shutdown_session(response_or_exc):
 
 def log_message(d):
     # Takes input dictionary d and writes it to the Log table
-    pass
+    print(Log)
+    # pass
 
 """
 ---------------- Endpoints ----------------
@@ -68,9 +69,9 @@ def trade():
 
 @app.route('/order_book')
 def order_book():
-    queryResults = g.session.query(Order).all()
-    result="work"
-    print(queryResults)
+    result = {"data": g.session.query(Order).all()}
+    
+    print(result)
     #Your code here
     #Note that you can access the database session using g.session
     return jsonify(result)
