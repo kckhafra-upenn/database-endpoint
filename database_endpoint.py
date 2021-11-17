@@ -8,7 +8,9 @@ import algosdk
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import load_only
-
+import hashlib, secrets
+from pycoin.ecdsa import generator_secp256k1, sign, verify
+import hashlib, secrets
 from models import Base, Order, Log
 engine = create_engine('sqlite:///orders.db')
 Base.metadata.bind = engine
@@ -29,6 +31,19 @@ def shutdown_session(response_or_exc):
 """
 -------- Helper methods (feel free to add your own!) -------
 """
+def sha3_256Hash(msg):
+    hashBytes = hashlib.sha3_256(msg.encode("utf8")).digest()
+    return int.from_bytes(hashBytes, byteorder="big")
+
+# def signECDSAsecp256k1(msg, privKey):
+#     msgHash = sha3_256Hash(msg)
+#     signature = sign(generator_secp256k1, privKey, msgHash)
+#     return signature
+
+def verifyECDSAsecp256k1(msg, signature, pubKey):
+    msgHash = sha3_256Hash(msg)
+    valid = verify(generator_secp256k1, pubKey, msgHash, signature)
+    return valid
 
 def log_message(d):
     print("ZZZ",json.dumps(d['payload']))
@@ -75,6 +90,10 @@ def trade():
             
         #Your code here
         #Note that you can access the database session using g.session
+        if(content['payload']['platform']=="Ethereum"):
+            sha3_256Hash(content)
+            print("VERIFY",verifyECDSAsecp256k1(content,content['sig'],content['sender_pk']))
+            print("YES")
         return {}
 
 @app.route('/order_book')
